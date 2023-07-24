@@ -30,40 +30,101 @@
 		</form>
 		<button type="button" class="btn btn-primary" onclick="salvarUser()">Salvar</button>
 		<button type="button" class="btn btn-warning" onclick="ClearForm('FormCadastroUser')">Limpar</button>
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalPesquisarUser">Open
+			modal </button>
+
+		<div class="modal fade" id="ModalPesquisarUser" tabindex="-1" aria-labelledby="exampleModalLabel"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Pesquisar usuário</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form>
+							<div class="mb-3">
+								<label for="nomeBusca" class="col-form-label">Informe o nome:</label>
+								<input type="text" class="form-control" id="nomeBusca">
+							</div>
+							<button type="button" class="btn btn-primary" onclick="salvarUser()">Buscar</button>
+						</form>
+						<table class="table" id="tabelaResultados" onclick="pesquisarUser()">
+							<thead>
+								<tr>
+									<th scope="col">ID</th>
+									<th scope="col">Nome</th>
+									<th scope="col">Editar</th>
+								</tr>
+							</thead>
+							<tbody>
+
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
-
+	
 	<script>
-		function salvarUser(){
+		function salvarUser() {
 			let id = $("#id").val();
 			let nome = $("#nome").val();
 			let idade = $("#idade").val();
 			alert(nome + " " + idade);
-			
+
 			$.ajax({
 				method: "POST",
-				url:"salvar",
+				url: "salvar",
 				data: JSON.stringify({
 					id: id,
-					nome: nome, 
-					idade: idade 
+					nome: nome,
+					idade: idade
 				}),
 				contentType: "application/json; charset=utf-8",
-				success: function (response){
+				success: function (response) {
 					//preenche o id com o valor retornado do banco
 					$("#id").val(response.id);
 					alert("salvo");
 				}
-			}).fail(function (xhr, status, errorThrow){
+			}).fail(function (xhr, status, errorThrow) {
 				alert("Erro ao salvar: ", xhr.response);
 			})
 		}
 		//limpa o formulário
-		function ClearForm(formName){
+		function ClearForm(formName) {
 			document.getElementById(formName).reset();
 		}
-	</script>
 		
+		function pesquisarUser(){
+			let nome = $('#nomeBusca').val();
+			if(nome != null && nome.trim() != ''){
+					$.ajax({
+					method: "POST",
+					url: "buscarPorNome",
+					data: JSON.stringify({
+						name: nome
+					}),
+					contentType: "application/json; charset=utf-8",
+					success: function (response) {
+						//preenche o id com o valor retornado do banco
+						$('#tabelaResultados > tbody > tr').remove();
+						for(let i = 0; i < response.length; i++){
+							$('#tabelaResultados > tbody > tr').append('<tr><td>'+response[i].id+'</td><td>'+response[i].nome+'</td></tr>');
+						}
+					}
+				}).fail(function (xhr, status, errorThrow) {
+					alert("Erro ao salvar: ", xhr.response);
+			})
+			}
+		}
+	</script>
+
 
 
 
@@ -72,13 +133,12 @@
 
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-		crossorigin="anonymous">
-	</script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" 
-	integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" 
-	crossorigin="anonymous" referrerpolicy="no-referrer">
-	</script>
+		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
+		</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"
+		integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw=="
+		crossorigin="anonymous" referrerpolicy="no-referrer">
+		</script>
 </body>
 
 </html>
