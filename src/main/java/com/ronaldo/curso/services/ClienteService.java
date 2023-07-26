@@ -1,5 +1,6 @@
 package com.ronaldo.curso.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,12 @@ public class ClienteService {
 		return cliente;
 	}
 	
-	public Cliente findByNome(String nome) {		
-		Optional<Cliente> cliente = clienteRepository.findByNome(nome);
-		return cliente.orElseThrow(() -> new ObjectNotFoundException(
-				"Objeto não encontrado! nome: " + nome + ", Tipo: " + Cliente.class.getName()));
+	public List<Cliente> findByNome(String nome) {		
+		List<Cliente> cliente = clienteRepository.findByNome(nome);
+		if(cliente == null) {
+			return null;
+		}
+		return cliente;
 	}
 
 	public Cliente findById(Integer id) {
