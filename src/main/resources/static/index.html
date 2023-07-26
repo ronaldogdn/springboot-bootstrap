@@ -38,7 +38,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Pesquisar usuário</h5>
+						<h5 class="modal-title" id="ModalBuscarUser">Pesquisar usuário</h5>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
@@ -47,7 +47,7 @@
 								<label for="nomeBusca" class="col-form-label">Informe o nome:</label>
 								<input type="text" class="form-control" id="nomeBusca">
 							</div>
-							<button type="button" class="btn btn-primary" onclick="salvarUser()">Buscar</button>
+							<button type="button" class="btn btn-primary" onclick="pesquisarUser()">Buscar</button>
 						</form>
 						<table class="table" id="tabelaResultados" onclick="pesquisarUser()">
 							<thead>
@@ -72,15 +72,15 @@
 
 	
 	<script>
+		var vet = [];
 		function salvarUser() {
 			let id = $("#id").val();
 			let nome = $("#nome").val();
 			let idade = $("#idade").val();
-			alert(nome + " " + idade);
 
 			$.ajax({
 				method: "POST",
-				url: "salvar",
+				url: "clientes",
 				data: JSON.stringify({
 					id: id,
 					nome: nome,
@@ -101,27 +101,57 @@
 			document.getElementById(formName).reset();
 		}
 		
-		function pesquisarUser(){
+		function pesquisarUser()
+		{
+			vet = [];
 			let nome = $('#nomeBusca').val();
-			if(nome != null && nome.trim() != ''){
-					$.ajax({
-					method: "POST",
-					url: "buscarPorNome",
-					data: JSON.stringify({
-						name: nome
-					}),
-					contentType: "application/json; charset=utf-8",
-					success: function (response) {
-						//preenche o id com o valor retornado do banco
-						$('#tabelaResultados > tbody > tr').remove();
-						for(let i = 0; i < response.length; i++){
-							$('#tabelaResultados > tbody > tr').append('<tr><td>'+response[i].id+'</td><td>'+response[i].nome+'</td></tr>');
+
+			if(nome != null && nome.trim() != '')
+			{
+					
+					$.ajax
+					({
+						method: "GET",
+						url: "clientes/buscar",
+						data: "nome="+nome,
+						success: function (response) {	
+							for(let i = 0; i < response.length; i++){
+								vet.push(response[i]);	
+							}
+									
+							//preenche o id com o valor retornado do banco
+							$('#tabelaResultados > tbody > tr').remove();
+							for(let i = 0; i < response.length; i++){
+								$('#tabelaResultados > tbody')
+								.append('<tr><td>'+response[i].id+'</td><td>'+response[i].nome+'</td><td><button type="button" class="btn btn-primary" onclick="editar('+response[i].id+')">Editar</button></td></tr>');
+							}
 						}
-					}
-				}).fail(function (xhr, status, errorThrow) {
-					alert("Erro ao salvar: ", xhr.response);
-			})
+						}).fail(function (xhr, status, errorThrow) {
+						alert("Erro ao procurar: "+ xhr.responseText);
+					})
 			}
+		}
+		
+		function editar(id)
+	    {
+			/*$.ajax
+			({
+						method: "GET",
+						url: "clientes/"+id,
+						//data: id,
+						success: function (response) {							
+							$("#id").val(response.id);
+							$("#nome").val(response.nome);
+							$("#idade").val(response.idade);
+							$('#ModalPesquisarUser').modal('hide');
+						}
+						}).fail(function (xhr, status, errorThrow) {
+						alert("Erro ao procurar: "+ xhr.responseText);
+			})*/
+			$("#id").val(vet[id-1].id);
+			$("#nome").val(vet[id-1].nome);
+			$("#idade").val(vet[id-1].idade);
+			//vet = [];
 		}
 	</script>
 
