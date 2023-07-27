@@ -38,4 +38,12 @@ public class ClienteService {
 		return cliente.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! id: " + id + ", Tipo: " + Cliente.class.getName()));
 	}
+
+	public boolean deleteById(Integer id) {
+		if(clienteRepository.existsById(id)) {
+			clienteRepository.deleteById(id);
+			return true;
+		}		
+		return false;
+	}
 }

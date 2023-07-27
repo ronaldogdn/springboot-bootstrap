@@ -55,6 +55,7 @@
 									<th scope="col">ID</th>
 									<th scope="col">Nome</th>
 									<th scope="col">Editar</th>
+									<th scope="col">Apagar</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -123,7 +124,16 @@
 							$('#tabelaResultados > tbody > tr').remove();
 							for(let i = 0; i < response.length; i++){
 								$('#tabelaResultados > tbody')
-								.append('<tr><td>'+response[i].id+'</td><td>'+response[i].nome+'</td><td><button type="button" class="btn btn-primary" onclick="editar('+response[i].id+')">Editar</button></td></tr>');
+								.append('<tr id="'+response[i].id+'">'
+										+'<td>'+response[i].id+'</td>'
+										+'<td>'+response[i].nome+'</td>'
+									    +'<td>'
+											+'<button type="button" class="btn btn-primary" onclick="editar('+response[i].id+')">Editar</button>'
+										+'</td>'
+										+'<td>'
+											+'<button type="button" class="btn btn-primary" onclick="apagarUser('+response[i].id+')">Apagar</button>'
+										+'</td>'+
+								    '</tr>');
 							}
 						}
 						}).fail(function (xhr, status, errorThrow) {
@@ -134,6 +144,14 @@
 		
 		function editar(id)
 	    {
+			let posicao = 0;
+			for(let i = 0; i < vet.length; i++){
+				if(vet[i].id == id)
+				{
+					posicao = i;
+					break;
+				}
+			}
 			/*$.ajax
 			({
 						method: "GET",
@@ -148,10 +166,34 @@
 						}).fail(function (xhr, status, errorThrow) {
 						alert("Erro ao procurar: "+ xhr.responseText);
 			})*/
-			$("#id").val(vet[id-1].id);
-			$("#nome").val(vet[id-1].nome);
-			$("#idade").val(vet[id-1].idade);
-			//vet = [];
+			$("#id").val(vet[posicao].id);
+			$("#nome").val(vet[posicao].nome);
+			$("#idade").val(vet[posicao].idade);
+			$('#ModalPesquisarUser').modal('hide');
+			vet = [];
+		}
+		
+		function apagarUser(id)
+		{
+			$.ajax
+			({
+						method: "DELETE",
+						url: "clientes/"+id,
+						//data: id,
+						success: function (response) {	
+							
+							//document.getElementById(id).remove();	
+							
+							ClearForm('FormCadastroUser');
+							
+						}
+			}).done(function(){
+				$('#' + id).remove();
+				$('#nomeBusca').val("");
+			}).fail(function (xhr, status, errorThrow) {
+							$('#ModalPesquisarUser').modal('hide');
+							alert("Erro ao apagar usuário: "+ xhr.responseText);
+					})
 		}
 	</script>
 
